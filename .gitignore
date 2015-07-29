@@ -1,3 +1,6 @@
+# Project specific
+src/out/
+
 # Compiled Object files
 *.slo
 *.lo
