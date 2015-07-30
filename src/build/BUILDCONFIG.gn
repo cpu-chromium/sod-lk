@@ -5,6 +5,8 @@
 # All binary targets will get this list of configs by default.
 _shared_binary_target_configs = [ "//build:compiler_defaults" ]
 
+arm_cpu = "cortex-m4"
+
 # Apply that default list to the binary target types.
 set_defaults("executable") {
   configs = _shared_binary_target_configs
@@ -22,4 +24,6 @@ set_defaults("source_set") {
   configs = _shared_binary_target_configs
 }
 
-set_default_toolchain("//build/toolchain:gcc")
+# set_default_toolchain("//build/toolchain:gcc")
+set_default_toolchain("//build/toolchain:clang35-none")
+
