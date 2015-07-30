@@ -79,7 +79,7 @@ toolchain("gcc") {
   }
 }
 
-toolchain("clang35-none") {
+toolchain("clang35_none") {
   tool("cc") {
     depfile = "{{output}}.d"
     command = "clang-3.5 -target arm-none-eabi -mcpu=$arm_cpu -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
@@ -103,7 +103,7 @@ toolchain("clang35-none") {
   tool("link") {
     outfile = "{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
-    command = "arm-none-eabi-ld {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}}"
+    command = "arm-none-eabi-ld {{ldflags}} -o $outfile --start-group @$rspfile {{solibs}} --end-group {{libs}}"
     description = "LINK $outfile"
     rspfile_content = "{{inputs}}"
     outputs = [

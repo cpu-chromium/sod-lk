@@ -6,24 +6,32 @@
 _shared_binary_target_configs = [ "//build:compiler_defaults" ]
 
 arm_cpu = "cortex-m4"
+raw_binary = true
 
 # Apply that default list to the binary target types.
 set_defaults("executable") {
   configs = _shared_binary_target_configs
-
+  
   # Executables get this additional configuration.
-  configs += [ "//build:executable_ldconfig" ]
+  if (raw_binary) {
+    configs += [ "//build:executable_raw" ]
+  } else {
+    configs += [ "//build:executable_ldconfig" ]
+  }
 }
+
 set_defaults("static_library") {
   configs = _shared_binary_target_configs
 }
+
 set_defaults("shared_library") {
   configs = _shared_binary_target_configs
 }
+
 set_defaults("source_set") {
   configs = _shared_binary_target_configs
 }
 
 # set_default_toolchain("//build/toolchain:gcc")
-set_default_toolchain("//build/toolchain:clang35-none")
+set_default_toolchain("//build/toolchain:clang35_none")
 
