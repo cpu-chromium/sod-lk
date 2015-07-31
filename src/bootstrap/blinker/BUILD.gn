@@ -5,6 +5,7 @@
 executable("blinker") {
   sources = [
     "main.cc",
+    "startup.c",
   ]
 }
 
