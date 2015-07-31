@@ -1,13 +1,8 @@
 #include <stdint.h>
 
-#ifdef __cplusplus
-  #define   __I     volatile             /*!< Defines 'read only' permissions                 */
-#else
-  #define   __I     volatile const       /*!< Defines 'read only' permissions                 */
-#endif
-#define     __O     volatile             /*!< Defines 'write only' permissions                */
-#define     __IO    volatile             /*!< Defines 'read / write' permissions              */
-
+#define __I     volatile const       /*!< Defines 'read only' permissions                 */
+#define __O     volatile             /*!< Defines 'write only' permissions                */
+#define __IO    volatile             /*!< Defines 'read / write' permissions              */
 
 struct SCB_Type {
   __I  uint32_t CPUID;                   /*!< Offset: 0x000 (R/ )  CPUID Base Register                                   */
