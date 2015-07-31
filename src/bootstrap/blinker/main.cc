@@ -72,6 +72,27 @@ __attribute__((always_inline)) void __ISB() {
   __asm volatile ("isb 0xF":::"memory");
 }
 
+
+#define SCB_CCSIDR_NUMSETS_Pos 13                                    // NumSets Position
+#define SCB_CCSIDR_NUMSETS_Msk (0x7FFFUL << SCB_CCSIDR_NUMSETS_Pos)  // NumSets Mask
+
+#define SCB_CCSIDR_ASSOCIATIVITY_Pos 3                                             /*!< SCB CCSIDR: Associativity Position */
+#define SCB_CCSIDR_ASSOCIATIVITY_Msk (0x3FFUL << SCB_CCSIDR_ASSOCIATIVITY_Pos)      /*!< SCB CCSIDR: Associativity Mask */
+
+#define SCB_CCSIDR_LINESIZE_Pos 0 // SCB CCSIDR: LineSize Position
+#define SCB_CCSIDR_LINESIZE_Msk (7UL /*shift r 0*/) // SCB CCSIDR: LineSize Mask
+
+#define SCB_CCR_DC_Pos 16  /*!< SCB CCR: Cache enable bit Position */
+#define SCB_CCR_DC_Msk (1UL << SCB_CCR_DC_Pos)   /*!< SCB CCR: Cache enable bit Mask */
+
+// Cache Size ID Register Macros
+#define CCSIDR_WAYS(x) (((x) & SCB_CCSIDR_ASSOCIATIVITY_Msk) >> SCB_CCSIDR_ASSOCIATIVITY_Pos)
+#define CCSIDR_SETS(x) (((x) & SCB_CCSIDR_NUMSETS_Msk) >> SCB_CCSIDR_NUMSETS_Pos      )
+#define CCSIDR_LSSHIFT(x) (((x) & SCB_CCSIDR_LINESIZE_Msk) /*shift r 0*/)
+
+// brief  Count leading zeros
+#define __CLZ __builtin_clz
+
 inline void EnableICache() {
   __DSB();
   __ISB();
@@ -81,9 +102,41 @@ inline void EnableICache() {
   __ISB();
 }
 
+inline void EnableDCache() {
+  SCB->CSSELR = (0UL << 1) | 0UL;         // Level 1 data cache
+  uint32_t ccsidr  = SCB->CCSIDR;
+  auto sets    = (uint32_t)(CCSIDR_SETS(ccsidr));
+  auto sshift  = (uint32_t)(CCSIDR_LSSHIFT(ccsidr) + 4UL);
+  auto ways    = (uint32_t)(CCSIDR_WAYS(ccsidr));
+  auto wshift  = (uint32_t)((uint32_t)__CLZ(ways) & 0x1FUL);
+
+  __DSB();
+
+  do {                                   // invalidate D-Cache
+    auto tmpways = ways;
+    do {
+      auto sw = ((tmpways << wshift) | (sets << sshift));
+      SCB->DCISW = sw;
+    } while(tmpways--);
+  } while(sets--);
+
+  __DSB();
+  SCB->CCR |=  (uint32_t)SCB_CCR_DC_Msk;   // enable D-Cache
+  __DSB();
+  __ISB();  
+}
+
+#define __BKPT(value) __asm volatile ("bkpt "#value)
+
+void halt_bp() {
+  __BKPT(6);  
+}
+
 int main() {
   EnableICache();
+  halt_bp();
 }
+
 
 extern "C" void __aeabi_unwind_cpp_pr0() {
 }
