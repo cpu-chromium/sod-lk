@@ -22,11 +22,12 @@ config("executable_raw") {
   cflags = [
     "-nostdlib",
   ]
-  cflags_c = [
+  cflags_cc = [
     "-fno-rtti",
     "-fno-exceptions",
     "-fno-unwind-tables",
     "-fno-asynchronous-unwind-tables",
+    "-std=c++11",
   ]
   ld_script = rebase_path("../arch/arm_cortex_2s.ld")
   ldflags = [
