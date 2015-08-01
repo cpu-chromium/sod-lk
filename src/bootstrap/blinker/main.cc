@@ -73,24 +73,43 @@ __attribute__((always_inline)) void __ISB() {
 }
 
 
-#define SCB_CCSIDR_NUMSETS_Pos 13                                    // NumSets Position
-#define SCB_CCSIDR_NUMSETS_Msk (0x7FFFUL << SCB_CCSIDR_NUMSETS_Pos)  // NumSets Mask
+#define SCB_CCSIDR_NUMSETS_Pos 13
+#define SCB_CCSIDR_NUMSETS_Msk (0x7FFFUL << SCB_CCSIDR_NUMSETS_Pos)
 
-#define SCB_CCSIDR_ASSOCIATIVITY_Pos 3                                             /*!< SCB CCSIDR: Associativity Position */
-#define SCB_CCSIDR_ASSOCIATIVITY_Msk (0x3FFUL << SCB_CCSIDR_ASSOCIATIVITY_Pos)      /*!< SCB CCSIDR: Associativity Mask */
+#define SCB_CCSIDR_ASSOCIATIVITY_Pos 3
+#define SCB_CCSIDR_ASSOCIATIVITY_Msk (0x3FFUL << SCB_CCSIDR_ASSOCIATIVITY_Pos)
 
-#define SCB_CCSIDR_LINESIZE_Pos 0 // SCB CCSIDR: LineSize Position
-#define SCB_CCSIDR_LINESIZE_Msk (7UL /*shift r 0*/) // SCB CCSIDR: LineSize Mask
+#define SCB_CCSIDR_LINESIZE_Pos 0
+#define SCB_CCSIDR_LINESIZE_Msk (7UL /*shift r 0*/)
 
-#define SCB_CCR_DC_Pos 16  /*!< SCB CCR: Cache enable bit Position */
-#define SCB_CCR_DC_Msk (1UL << SCB_CCR_DC_Pos)   /*!< SCB CCR: Cache enable bit Mask */
+#define SCB_CCR_DC_Pos 16  // Cache enable bit Position.
+#define SCB_CCR_DC_Msk (1UL << SCB_CCR_DC_Pos)   // Cache enable bit Mask
 
 // Cache Size ID Register Macros
 #define CCSIDR_WAYS(x) (((x) & SCB_CCSIDR_ASSOCIATIVITY_Msk) >> SCB_CCSIDR_ASSOCIATIVITY_Pos)
 #define CCSIDR_SETS(x) (((x) & SCB_CCSIDR_NUMSETS_Msk) >> SCB_CCSIDR_NUMSETS_Pos      )
 #define CCSIDR_LSSHIFT(x) (((x) & SCB_CCSIDR_LINESIZE_Msk) /*shift r 0*/)
 
-// brief  Count leading zeros
+// SCB Application Interrupt and Reset Control Register Definitions
+#define SCB_AIRCR_VECTKEY_Pos 16            
+#define SCB_AIRCR_VECTKEY_Msk (0xFFFFUL << SCB_AIRCR_VECTKEY_Pos)
+
+#define SCB_AIRCR_PRIGROUP_Pos 8
+#define SCB_AIRCR_PRIGROUP_Msk (7UL << SCB_AIRCR_PRIGROUP_Pos)
+
+// Priority groups.
+#define NVIC_PRIORITYGROUP_0 ((uint32_t)0x00000007) // 0 bits for pre-emption priority
+                                                    // 4 bits for subpriority
+#define NVIC_PRIORITYGROUP_1 ((uint32_t)0x00000006) // 1 bits for pre-emption priority
+                                                    // 3 bits for subpriority
+#define NVIC_PRIORITYGROUP_2 ((uint32_t)0x00000005) // 2 bits for pre-emption priority
+                                                    // 2 bits for subpriority
+#define NVIC_PRIORITYGROUP_3 ((uint32_t)0x00000004) // 3 bits for pre-emption priority
+                                                    // 1 bits for subpriority
+#define NVIC_PRIORITYGROUP_4 ((uint32_t)0x00000003) // 4 bits for pre-emption priority
+                                                    // 0 bits for subpriority
+
+// Count leading zeros
 #define __CLZ __builtin_clz
 
 inline void EnableICache() {
@@ -132,11 +151,29 @@ void halt_bp() {
   __BKPT(6);  
 }
 
-int main() {
-  EnableICache();
-  halt_bp();
+//  The function sets the priority grouping field using the required unlock sequence.
+//  The parameter PriorityGroup is assigned to the field SCB->AIRCR [10:8].
+//  Only values from 0..7 are used.
+//  In case of a conflict between priority grouping and available
+//  priority bits (__NVIC_PRIO_BITS), the smallest possible priority group is set.
+
+inline void NVIC_SetPriorityGrouping(uint32_t PriorityGroup) {
+  // Only values 0..7 are used.
+  uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07UL);      
+  uint32_t reg_value  =  SCB->AIRCR;
+  reg_value &= ~((uint32_t)(SCB_AIRCR_VECTKEY_Msk | SCB_AIRCR_PRIGROUP_Msk));
+  // Insert write key and priorty group.
+  reg_value = (reg_value |
+              ((uint32_t)0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
+              (PriorityGroupTmp << 8));
+  SCB->AIRCR = reg_value;
 }
 
+int main() {
+  EnableICache();
+  NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+  halt_bp();
+}
 
 extern "C" void __aeabi_unwind_cpp_pr0() {
 }
