@@ -96,14 +96,6 @@ struct SysTick_Type {
 #define SCB_CCR_IC_Pos 17
 #define SCB_CCR_IC_Msk (1UL << SCB_CCR_IC_Pos)
 
-__attribute__((always_inline)) void __DSB() {
-  __asm volatile ("dsb 0xF":::"memory");
-}
-
-__attribute__((always_inline)) void __ISB() {
-  __asm volatile ("isb 0xF":::"memory");
-}
-
 #define SCB_CCSIDR_NUMSETS_Pos 13
 #define SCB_CCSIDR_NUMSETS_Msk (0x7FFFUL << SCB_CCSIDR_NUMSETS_Pos)
 
@@ -154,8 +146,22 @@ __attribute__((always_inline)) void __ISB() {
 #define SysTick_LOAD_RELOAD_Pos 0   
 #define SysTick_LOAD_RELOAD_Msk (0xFFFFFFUL /*l shift 0*/)
 
+#define  TICK_INT_PRIORITY ((uint32_t)0x0F)
+
 // Count leading zeros
 #define __CLZ __builtin_clz
+
+__attribute__((always_inline)) void __DSB() {
+  __asm volatile ("dsb 0xF":::"memory");
+}
+
+__attribute__((always_inline)) void __ISB() {
+  __asm volatile ("isb 0xF":::"memory");
+}
+
+__attribute__((always_inline)) void __WFI() {
+  __asm volatile ("wfi");
+}
 
 inline void EnableICache() {
   __DSB();
@@ -219,7 +225,7 @@ inline void NVIC_SetPriorityGrouping(uint32_t PriorityGroup) {
 //   note: The priority cannot be set for every core interrupt.
 //   |IRQn|  Interrupt number.
 //   |priority|  Priority to set.
- 
+
 inline void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority) {
   if((int32_t)IRQn < 0) {
     SCB->SHPR[(((uint32_t)(int32_t)IRQn) & 0xFUL)-4UL] =
@@ -248,10 +254,34 @@ inline bool SysTick_Config(uint32_t ticks) {
   return true;
 }
 
+inline bool InitSysTick(uint32_t ticks) {
+  if (!SysTick_Config(ticks))
+    return false;
+  NVIC_SetPriority(SysTick_IRQn, TICK_INT_PRIORITY);
+  return true;
+}
+
+volatile uint32_t milisecs_count = 0;
+
+void SysTick_Handler() {
+  ++milisecs_count;
+}
+
+void DelayMS(uint32_t wait_ms) {
+  auto start_ms = milisecs_count;
+  while ((milisecs_count - start_ms) < wait_ms) {
+    __WFI();
+  }
+}
+
 int main() {
   EnableICache();
   NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
-  halt_bp();
+  if (!InitSysTick(16000))
+    halt_bp();
+  while (true) {
+    DelayMS(500);
+  }
 }
 
 extern "C" void __aeabi_unwind_cpp_pr0() {
