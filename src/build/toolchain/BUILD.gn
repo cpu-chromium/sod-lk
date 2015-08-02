@@ -102,12 +102,14 @@ toolchain("clang35_none") {
 
   tool("link") {
     outfile = "{{target_output_name}}{{output_extension}}"
+    mapfile = "$outfile.map" 
     rspfile = "$outfile.rsp"
-    command = "arm-none-eabi-ld {{ldflags}} -o $outfile --start-group @$rspfile {{solibs}} --end-group {{libs}}"
+    command = "arm-none-eabi-ld {{ldflags}} -o $outfile -Map $mapfile --start-group @$rspfile {{solibs}} --end-group {{libs}}"
     description = "LINK $outfile"
     rspfile_content = "{{inputs}}"
     outputs = [
       outfile,
+      mapfile,
     ]
   }
 
