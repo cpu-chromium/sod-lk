@@ -263,7 +263,7 @@ inline bool InitSysTick(uint32_t ticks) {
 
 volatile uint32_t milisecs_count = 0;
 
-void SysTick_Handler() {
+extern "C" void SysTick_Handler() {
   ++milisecs_count;
 }
 
