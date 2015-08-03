@@ -33,6 +33,7 @@ config("executable_raw") {
   ldflags = [
      "-T",
      ld_script,
+     "--gc-sections",
   ]
 }
 
