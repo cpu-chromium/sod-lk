@@ -107,6 +107,7 @@ toolchain("clang35_none") {
     command = "arm-none-eabi-ld {{ldflags}} -o $outfile -Map $mapfile --start-group @$rspfile {{solibs}} --end-group {{libs}}"
     description = "LINK $outfile"
     rspfile_content = "{{inputs}}"
+    default_output_extension = ".elf"
     outputs = [
       outfile,
       mapfile,
