@@ -84,14 +84,124 @@ struct SysTick_Type {
   __I  uint32_t CALIB;            // 0x00C (R/ )  SysTick Calibration Register
 };
 
+// General Purpose I/O.
+struct GPIO_Type {
+  __IO uint32_t MODER;    // port mode register,                0x00      
+  __IO uint32_t OTYPER;   // port output type register,         0x04      
+  __IO uint32_t OSPEEDR;  // port output speed register,        0x08      
+  __IO uint32_t PUPDR;    // port pull-up/pull-down register,   0x0C      
+  __IO uint32_t IDR;      // port input data register,          0x10      
+  __IO uint32_t ODR;      // port output data register,         0x14      
+  __IO uint32_t BSRR;     // port bit set/reset register,       0x18      
+  __IO uint32_t LCKR;     // port configuration lock register,  0x1C      
+  __IO uint32_t AFR[2];   // alternate function registers,      0x20-0x24 
+};
+
+// Reset and Clock Control.
+struct RCC_Type {
+  __IO uint32_t CR;            // RCC clock control register,                          0x00 
+  __IO uint32_t PLLCFGR;       // RCC PLL configuration register,                      0x04 
+  __IO uint32_t CFGR;          // RCC clock configuration register,                    0x08 
+  __IO uint32_t CIR;           // RCC clock interrupt register,                        0x0C 
+  __IO uint32_t AHB1RSTR;      // RCC AHB1 peripheral reset register,                  0x10 
+  __IO uint32_t AHB2RSTR;      // RCC AHB2 peripheral reset register,                  0x14 
+  __IO uint32_t AHB3RSTR;      // RCC AHB3 peripheral reset register,                  0x18 
+       uint32_t RESERVED0;     // Reserved, 0x1C                                            
+  __IO uint32_t APB1RSTR;      // RCC APB1 peripheral reset register,                  0x20 
+  __IO uint32_t APB2RSTR;      // RCC APB2 peripheral reset register,                  0x24 
+       uint32_t RESERVED1[2];  // Reserved, 0x28-0x2C                                       
+  __IO uint32_t AHB1ENR;       // RCC AHB1 peripheral clock register,                  0x30 
+  __IO uint32_t AHB2ENR;       // RCC AHB2 peripheral clock register,                  0x34 
+  __IO uint32_t AHB3ENR;       // RCC AHB3 peripheral clock register,                  0x38 
+       uint32_t RESERVED2;     // Reserved, 0x3C                                            
+  __IO uint32_t APB1ENR;       // RCC APB1 peripheral clock enable register,           0x40 
+  __IO uint32_t APB2ENR;       // RCC APB2 peripheral clock enable register,           0x44 
+       uint32_t RESERVED3[2];  // Reserved, 0x48-0x4C                                       
+  __IO uint32_t AHB1LPENR;     // RCC AHB1 peripheral clock enable in low power mode   0x50 
+  __IO uint32_t AHB2LPENR;     // RCC AHB2 peripheral clock enable in low power mode   0x54 
+  __IO uint32_t AHB3LPENR;     // RCC AHB3 peripheral clock enable in low power mode   0x58 
+       uint32_t RESERVED4;     // Reserved, 0x5C                                            
+  __IO uint32_t APB1LPENR;     // RCC APB1 peripheral clock enable in low power mode   0x60 
+  __IO uint32_t APB2LPENR;     // RCC APB2 peripheral clock enable in low power mode   0x64 
+       uint32_t RESERVED5[2];  // Reserved, 0x68-0x6C                                       
+  __IO uint32_t BDCR;          // RCC Backup domain control register,                  0x70 
+  __IO uint32_t CSR;           // RCC clock control & status register,                 0x74 
+       uint32_t RESERVED6[2];  // Reserved, 0x78-0x7C                                       
+  __IO uint32_t SSCGR;         // RCC spread spectrum clock generation register,       0x80 
+  __IO uint32_t PLLI2SCFGR;    // RCC PLLI2S configuration register,                   0x84 
+  __IO uint32_t PLLSAICFGR;    // RCC PLLSAI configuration register,                   0x88 
+  __IO uint32_t DCKCFGR1;      // RCC Dedicated Clocks configuration register1,        0x8C 
+  __IO uint32_t DCKCFGR2;      // RCC Dedicated Clocks configuration register 2,       0x90
+};
+
+#define  RCC_AHB1ENR_GPIOAEN      ((uint32_t)0x00000001)
+#define  RCC_AHB1ENR_GPIOBEN      ((uint32_t)0x00000002)
+#define  RCC_AHB1ENR_GPIOCEN      ((uint32_t)0x00000004)
+#define  RCC_AHB1ENR_GPIODEN      ((uint32_t)0x00000008)
+#define  RCC_AHB1ENR_GPIOEEN      ((uint32_t)0x00000010)
+#define  RCC_AHB1ENR_GPIOFEN      ((uint32_t)0x00000020)
+#define  RCC_AHB1ENR_GPIOGEN      ((uint32_t)0x00000040)
+#define  RCC_AHB1ENR_GPIOHEN      ((uint32_t)0x00000080)
+#define  RCC_AHB1ENR_GPIOIEN      ((uint32_t)0x00000100)
+#define  RCC_AHB1ENR_GPIOJEN      ((uint32_t)0x00000200)
+#define  RCC_AHB1ENR_GPIOKEN      ((uint32_t)0x00000400)
+#define  RCC_AHB1ENR_CRCEN        ((uint32_t)0x00001000)
+#define  RCC_AHB1ENR_BKPSRAMEN    ((uint32_t)0x00040000)
+#define  RCC_AHB1ENR_DTCMRAMEN    ((uint32_t)0x00100000)
+#define  RCC_AHB1ENR_DMA1EN       ((uint32_t)0x00200000)
+#define  RCC_AHB1ENR_DMA2EN       ((uint32_t)0x00400000)
+#define  RCC_AHB1ENR_DMA2DEN      ((uint32_t)0x00800000)
+#define  RCC_AHB1ENR_ETHMACEN     ((uint32_t)0x02000000)
+#define  RCC_AHB1ENR_ETHMACTXEN   ((uint32_t)0x04000000)
+#define  RCC_AHB1ENR_ETHMACRXEN   ((uint32_t)0x08000000)
+#define  RCC_AHB1ENR_ETHMACPTPEN  ((uint32_t)0x10000000)
+#define  RCC_AHB1ENR_OTGHSEN      ((uint32_t)0x20000000)
+#define  RCC_AHB1ENR_OTGHSULPIEN  ((uint32_t)0x40000000)
+
+
 #define SCS_BASE (0xE000E000UL)    // System Control Space Base Address.
 #define SysTick_BASE (SCS_BASE +  0x0010UL)
 #define NVIC_BASE (SCS_BASE +  0x0100UL)
 #define SCB_BASE (SCS_BASE +  0x0D00UL)
 
+#define PERIPH_BASE       ((uint32_t)0x40000000) // AHB/ABP Peripherals.
+
+// Peripheral memory map.
+#define APB1PERIPH_BASE        PERIPH_BASE
+#define APB2PERIPH_BASE       (PERIPH_BASE + 0x00010000)
+#define AHB1PERIPH_BASE       (PERIPH_BASE + 0x00020000)
+#define AHB2PERIPH_BASE       (PERIPH_BASE + 0x10000000)
+
+#define GPIOA_BASE        (AHB1PERIPH_BASE + 0x0000)
+#define GPIOB_BASE        (AHB1PERIPH_BASE + 0x0400)
+#define GPIOC_BASE        (AHB1PERIPH_BASE + 0x0800)
+#define GPIOD_BASE        (AHB1PERIPH_BASE + 0x0C00)
+#define GPIOE_BASE        (AHB1PERIPH_BASE + 0x1000)
+#define GPIOF_BASE        (AHB1PERIPH_BASE + 0x1400)
+#define GPIOG_BASE        (AHB1PERIPH_BASE + 0x1800)
+#define GPIOH_BASE        (AHB1PERIPH_BASE + 0x1C00)
+#define GPIOI_BASE        (AHB1PERIPH_BASE + 0x2000)
+#define GPIOJ_BASE        (AHB1PERIPH_BASE + 0x2400)
+#define GPIOK_BASE        (AHB1PERIPH_BASE + 0x2800)
+
+#define RCC_BASE           (AHB1PERIPH_BASE + 0x3800)
+
+#define GPIOA     ((GPIO_Type*) GPIOA_BASE)
+#define GPIOB     ((GPIO_Type*) GPIOB_BASE)
+#define GPIOC     ((GPIO_Type*) GPIOC_BASE)
+#define GPIOD     ((GPIO_Type*) GPIOD_BASE)
+#define GPIOE     ((GPIO_Type*) GPIOE_BASE)
+#define GPIOF     ((GPIO_Type*) GPIOF_BASE)
+#define GPIOG     ((GPIO_Type*) GPIOG_BASE)
+#define GPIOH     ((GPIO_Type*) GPIOH_BASE)
+#define GPIOI     ((GPIO_Type*) GPIOI_BASE)
+#define GPIOJ     ((GPIO_Type*) GPIOJ_BASE)
+#define GPIOK     ((GPIO_Type*) GPIOK_BASE)
+
 #define SCB ((SCB_Type*) SCB_BASE)
 #define SysTick ((SysTick_Type *) SysTick_BASE) 
 #define NVIC ((NVIC_Type*) NVIC_BASE)
+#define RCC  ((RCC_Type*) RCC_BASE)
 
 #define SCB_CCR_IC_Pos 17
 #define SCB_CCR_IC_Msk (1UL << SCB_CCR_IC_Pos)
@@ -262,6 +372,7 @@ inline bool InitSysTick(uint32_t ticks) {
 }
 
 volatile uint32_t milisecs_count = 0;
+volatile uint32_t loop_count = 0;
 
 extern "C" void SysTick_Handler() {
   ++milisecs_count;
@@ -274,13 +385,170 @@ void DelayMS(uint32_t wait_ms) {
   }
 }
 
+volatile void SetBit(volatile uint32_t& dest, uint32_t bit) {
+  dest |= bit;
+}
+
+bool ReadBit(const volatile uint32_t& reg, uint32_t bit) {
+  return reg & bit;
+}
+
+inline bool GPIOA_EnableClock() {
+  volatile uint32_t tmpreg;
+  SetBit(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
+  // Delay after an RCC peripheral clock enabling.
+  return ReadBit(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
+}
+
+struct GPIO_InitType {
+  uint32_t Pin;
+  uint32_t Mode;
+  uint32_t Pull;  
+  uint32_t Speed; 
+  uint32_t Alternate;  
+};
+
+#define GPIO_PIN_0                 ((uint16_t)0x0001)  /* Pin 0 selected    */
+#define GPIO_PIN_1                 ((uint16_t)0x0002)  /* Pin 1 selected    */
+#define GPIO_PIN_2                 ((uint16_t)0x0004)  /* Pin 2 selected    */
+#define GPIO_PIN_3                 ((uint16_t)0x0008)  /* Pin 3 selected    */
+#define GPIO_PIN_4                 ((uint16_t)0x0010)  /* Pin 4 selected    */
+#define GPIO_PIN_5                 ((uint16_t)0x0020)  /* Pin 5 selected    */
+#define GPIO_PIN_6                 ((uint16_t)0x0040)  /* Pin 6 selected    */
+#define GPIO_PIN_7                 ((uint16_t)0x0080)  /* Pin 7 selected    */
+#define GPIO_PIN_8                 ((uint16_t)0x0100)  /* Pin 8 selected    */
+#define GPIO_PIN_9                 ((uint16_t)0x0200)  /* Pin 9 selected    */
+#define GPIO_PIN_10                ((uint16_t)0x0400)  /* Pin 10 selected   */
+#define GPIO_PIN_11                ((uint16_t)0x0800)  /* Pin 11 selected   */
+#define GPIO_PIN_12                ((uint16_t)0x1000)  /* Pin 12 selected   */
+#define GPIO_PIN_13                ((uint16_t)0x2000)  /* Pin 13 selected   */
+#define GPIO_PIN_14                ((uint16_t)0x4000)  /* Pin 14 selected   */
+#define GPIO_PIN_15                ((uint16_t)0x8000)  /* Pin 15 selected   */
+#define GPIO_PIN_All               ((uint16_t)0xFFFF)  /* All pins selected */
+
+#define  GPIO_MODE_INPUT                        ((uint32_t)0x00000000)   /*!< Input Floating Mode                   */
+#define  GPIO_MODE_OUTPUT_PP                    ((uint32_t)0x00000001)   /*!< Output Push Pull Mode                 */
+#define  GPIO_MODE_OUTPUT_OD                    ((uint32_t)0x00000011)   /*!< Output Open Drain Mode                */
+#define  GPIO_MODE_AF_PP                        ((uint32_t)0x00000002)   /*!< Alternate Function Push Pull Mode     */
+#define  GPIO_MODE_AF_OD                        ((uint32_t)0x00000012)   /*!< Alternate Function Open Drain Mode    */
+
+#define  GPIO_MODE_ANALOG                       ((uint32_t)0x00000003)   /*!< Analog Mode  */
+    
+#define  GPIO_MODE_IT_RISING                    ((uint32_t)0x10110000)   /*!< External Interrupt Mode with Rising edge trigger detection          */
+#define  GPIO_MODE_IT_FALLING                   ((uint32_t)0x10210000)   /*!< External Interrupt Mode with Falling edge trigger detection         */
+#define  GPIO_MODE_IT_RISING_FALLING            ((uint32_t)0x10310000)   /*!< External Interrupt Mode with Rising/Falling edge trigger detection  */
+ 
+#define  GPIO_MODE_EVT_RISING                   ((uint32_t)0x10120000)   /*!< External Event Mode with Rising edge trigger detection               */
+#define  GPIO_MODE_EVT_FALLING                  ((uint32_t)0x10220000)   /*!< External Event Mode with Falling edge trigger detection              */
+#define  GPIO_MODE_EVT_RISING_FALLING           ((uint32_t)0x10320000)   /*!< External Event Mode with Rising/Falling edge trigger detection       */
+
+#define  GPIO_SPEED_LOW         ((uint32_t)0x00000000)  /*!< Low speed     */
+#define  GPIO_SPEED_MEDIUM      ((uint32_t)0x00000001)  /*!< Medium speed  */
+#define  GPIO_SPEED_FAST        ((uint32_t)0x00000002)  /*!< Fast speed    */
+#define  GPIO_SPEED_HIGH        ((uint32_t)0x00000003)  /*!< High speed    */
+
+#define  GPIO_NOPULL        ((uint32_t)0x00000000)   /*!< No Pull-up or Pull-down activation  */
+#define  GPIO_PULLUP        ((uint32_t)0x00000001)   /*!< Pull-up activation                  */
+#define  GPIO_PULLDOWN      ((uint32_t)0x00000002)   /*!< Pull-down activation                */
+
+#define GPIO_MODER_MODER0                    ((uint32_t)0x00000003)
+#define GPIO_OSPEEDER_OSPEEDR0               ((uint32_t)0x00000003)
+#define GPIO_PUPDR_PUPDR0                    ((uint32_t)0x00000003)
+
+#define EXTI_MODE             ((uint32_t)0x10000000)
+#define GPIO_MODE             ((uint32_t)0x00000003)
+#define GPIO_OUTPUT_TYPE      ((uint32_t)0x00000010)
+
+#define GPIO_OTYPER_OT_0                     ((uint32_t)0x00000001)
+
+// Initializes the GPIOx peripheral according to the specified parameters in the GPIO_Init.
+// GPIOx: where x can be (A..K) to select the GPIO peripheral.
+// GPIO_Init: pointer to a GPIO_InitTypeDef structure that contains
+// the configuration information for the specified GPIO peripheral.
+void GPIO_InitPin(GPIO_Type* GPIOx, GPIO_InitType* GPIO_Init) {
+  uint32_t temp = 0;
+
+  /* Configure the port pins */
+  for(uint32_t position = 0; position < 16UL; position++) {
+    /* Get the IO position */
+    uint32_t ioposition = ((uint32_t)0x01) << position;
+    /* Get the current IO position */
+    uint32_t iocurrent = (uint32_t)(GPIO_Init->Pin) & ioposition;
+
+    if(iocurrent == ioposition) {
+      /*--------------------- GPIO Mode Configuration ------------------------*/
+      /* In case of Alternate function mode selection */
+      if((GPIO_Init->Mode == GPIO_MODE_AF_PP) || (GPIO_Init->Mode == GPIO_MODE_AF_OD)) {        
+        /* Configure Alternate function mapped with the current IO */
+        temp = GPIOx->AFR[position >> 3];
+        temp &= ~((uint32_t)0xF << ((uint32_t)(position & (uint32_t)0x07) * 4)) ;
+        temp |= ((uint32_t)(GPIO_Init->Alternate) << (((uint32_t)position & (uint32_t)0x07) * 4));
+        GPIOx->AFR[position >> 3] = temp;
+      }
+
+      /* Configure IO Direction mode (Input, Output, Alternate or Analog) */
+      temp = GPIOx->MODER;
+      temp &= ~(GPIO_MODER_MODER0 << (position * 2));
+      temp |= ((GPIO_Init->Mode & GPIO_MODE) << (position * 2));
+      GPIOx->MODER = temp;
+
+      /* In case of Output or Alternate function mode selection */
+      if((GPIO_Init->Mode == GPIO_MODE_OUTPUT_PP) || (GPIO_Init->Mode == GPIO_MODE_AF_PP) ||
+         (GPIO_Init->Mode == GPIO_MODE_OUTPUT_OD) || (GPIO_Init->Mode == GPIO_MODE_AF_OD)) {
+        /* Configure the IO Speed */
+        temp = GPIOx->OSPEEDR; 
+        temp &= ~(GPIO_OSPEEDER_OSPEEDR0 << (position * 2));
+        temp |= (GPIO_Init->Speed << (position * 2));
+        GPIOx->OSPEEDR = temp;
+
+        /* Configure the IO Output Type */
+        temp = GPIOx->OTYPER;
+        temp &= ~(GPIO_OTYPER_OT_0 << position) ;
+        temp |= (((GPIO_Init->Mode & GPIO_OUTPUT_TYPE) >> 4) << position);
+        GPIOx->OTYPER = temp;
+      }
+
+      /* Activate the Pull-up or Pull down resistor for the current IO */
+      temp = GPIOx->PUPDR;
+      temp &= ~(GPIO_PUPDR_PUPDR0 << (position * 2));
+      temp |= ((GPIO_Init->Pull) << (position * 2));
+      GPIOx->PUPDR = temp;
+
+      /*--------------------- EXTI Mode Configuration ------------------------*/
+      /* Configure the External Interrupt or event for the current IO */
+      if((GPIO_Init->Mode & EXTI_MODE) == EXTI_MODE){
+        // Not implemented yet.
+        halt_bp();
+      }
+    }
+  }
+}
+
+
+inline void GPIO_TogglePin(GPIO_Type* GPIOx, uint16_t GPIO_Pin) {
+  GPIOx->ODR ^= GPIO_Pin;
+}
+
+
 int main() {
   EnableICache();
   NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+  GPIOA_EnableClock();
+
+  GPIO_InitType GPIO_InitStruct = {0};
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+  GPIO_InitStruct.Pin = GPIO_PIN_9;
+  GPIO_InitPin(GPIOA, &GPIO_InitStruct);
+
+
   if (!InitSysTick(16000))
     halt_bp();
   while (true) {
+    GPIO_TogglePin(GPIOA, 9);
     DelayMS(500);
+    ++loop_count;
   }
 }
 
