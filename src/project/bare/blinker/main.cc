@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "interrupt_types.h"
+#include "arch/arm/cortex-m/interrupt_types.h"
 
 #define __I     volatile const       // Defines 'read only' permissions     
 #define __O     volatile             // Defines 'write only' permissions    

@@ -5,7 +5,7 @@
 # This target will be built if no target is specified when invoking ninja.
 group("default") {
   deps = [
-    "//bootstrap/blinker",
+    "//project:bare_blinker",
   ]
 }
 

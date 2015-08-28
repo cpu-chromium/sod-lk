@@ -2,10 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-executable("blinker") {
+executable("bare_blinker") {
   sources = [
-    "main.cc",
-    "startup.c",
+    "bare/blinker/main.cc",
+    "//arch/arm/cortex-m/startup.c",
   ]
 }
 
