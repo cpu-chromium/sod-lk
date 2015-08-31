@@ -1,2 +1,2 @@
 # sod-lk
-Seeds of Decay LK edition
+Sky on Devices (aka Seeds of Decay) LK edition.
