@@ -1,137 +1,81 @@
 #include <stdint.h>
+#include "arch/memory_macros.h"
 #include "arch/arm/cortex-m/interrupt_types.h"
-
-#define __I     volatile const       // Defines 'read only' permissions     
-#define __O     volatile             // Defines 'write only' permissions    
-#define __IO    volatile             // Defines 'read / write' permissions  
-
-// System Control Block.
-struct SCB_Type {
-  __I  uint32_t CPUID;         // 0x000 (R/ )  CPUID Base Register                       
-  __IO uint32_t ICSR;          // 0x004 (R/W)  Interrupt Control and State Register      
-  __IO uint32_t VTOR;          // 0x008 (R/W)  Vector Table Offset Register              
-  __IO uint32_t AIRCR;         // 0x00C (R/W)  Application Interrupt and Reset Control Register
-  __IO uint32_t SCR;           // 0x010 (R/W)  System Control Register                   
-  __IO uint32_t CCR;           // 0x014 (R/W)  Configuration Control Register            
-  __IO uint8_t  SHPR[12];      // 0x018 (R/W)  System Handlers Priority Registers (4-7, 8-11, 12-15)
-  __IO uint32_t SHCSR;         // 0x024 (R/W)  System Handler Control and State Register 
-  __IO uint32_t CFSR;          // 0x028 (R/W)  Configurable Fault Status Register        
-  __IO uint32_t HFSR;          // 0x02C (R/W)  HardFault Status Register                 
-  __IO uint32_t DFSR;          // 0x030 (R/W)  Debug Fault Status Register               
-  __IO uint32_t MMFAR;         // 0x034 (R/W)  MemManage Fault Address Register          
-  __IO uint32_t BFAR;          // 0x038 (R/W)  BusFault Address Register                 
-  __IO uint32_t AFSR;          // 0x03C (R/W)  Auxiliary Fault Status Register           
-  __I  uint32_t ID_PFR[2];     // 0x040 (R/ )  Processor Feature Register                
-  __I  uint32_t ID_DFR;        // 0x048 (R/ )  Debug Feature Register                    
-  __I  uint32_t ID_AFR;        // 0x04C (R/ )  Auxiliary Feature Register                
-  __I  uint32_t ID_MFR[4];     // 0x050 (R/ )  Memory Model Feature Register             
-  __I  uint32_t ID_ISAR[5];    // 0x060 (R/ )  Instruction Set Attributes Register       
-       uint32_t RESERVED0[1];
-  __I  uint32_t CLIDR;         // 0x078 (R/ )  Cache Level ID register                   
-  __I  uint32_t CTR;           // 0x07C (R/ )  Cache Type register                       
-  __I  uint32_t CCSIDR;        // 0x080 (R/ )  Cache Size ID Register                    
-  __IO uint32_t CSSELR;        // 0x084 (R/W)  Cache Size Selection Register             
-  __IO uint32_t CPACR;         // 0x088 (R/W)  Coprocessor Access Control Register       
-       uint32_t RESERVED3[93];
-  __O  uint32_t STIR;          // 0x200 ( /W)  Software Triggered Interrupt Register     
-       uint32_t RESERVED4[15];
-  __I  uint32_t MVFR0;         // 0x240 (R/ )  Media and VFP Feature Register 0          
-  __I  uint32_t MVFR1;         // 0x244 (R/ )  Media and VFP Feature Register 1          
-  __I  uint32_t MVFR2;         // 0x248 (R/ )  Media and VFP Feature Register 1          
-       uint32_t RESERVED5[1];
-  __O  uint32_t ICIALLU;       // 0x250 ( /W)  I-Cache Invalidate All to PoU             
-       uint32_t RESERVED6[1];
-  __O  uint32_t ICIMVAU;       // 0x258 ( /W)  I-Cache Invalidate by MVA to PoU          
-  __O  uint32_t DCIMVAC;       // 0x25C ( /W)  D-Cache Invalidate by MVA to PoC          
-  __O  uint32_t DCISW;         // 0x260 ( /W)  D-Cache Invalidate by Set-way             
-  __O  uint32_t DCCMVAU;       // 0x264 ( /W)  D-Cache Clean by MVA to PoU               
-  __O  uint32_t DCCMVAC;       // 0x268 ( /W)  D-Cache Clean by MVA to PoC               
-  __O  uint32_t DCCSW;         // 0x26C ( /W)  D-Cache Clean by Set-way                  
-  __O  uint32_t DCCIMVAC;      // 0x270 ( /W)  D-Cache Clean and Invalidate by MVA to PoC
-  __O  uint32_t DCCISW;        // 0x274 ( /W)  D-Cache Clean and Invalidate by Set-way   
-       uint32_t RESERVED7[6];
-  __IO uint32_t ITCMCR;        // 0x290 (R/W)  Instruction Tightly-Coupled Memory Control Register
-  __IO uint32_t DTCMCR;        // 0x294 (R/W)  Data Tightly-Coupled Memory Control Registers
-  __IO uint32_t AHBPCR;        // 0x298 (R/W)  AHBP Control Register                     
-  __IO uint32_t CACR;          // 0x29C (R/W)  L1 Cache Control Register                 
-  __IO uint32_t AHBSCR;        // 0x2A0 (R/W)  AHB Slave Control Register                
-       uint32_t RESERVED8[1];
-  __IO uint32_t ABFSR;         // 0x2A8 (R/W)  Auxiliary Bus Fault Status Register       
-};
+#include "arch/arm/cortex-m/system_control_block.h"
 
 // Nested Vectored Interrupt Controller (NVIC)
 struct NVIC_Type {
-  __IO uint32_t ISER[8];          // 0x000 (R/W)  Interrupt Set Enable Register
+  A_IO uint32_t ISER[8];          // 0x000 (R/W)  Interrupt Set Enable Register
        uint32_t RESERVED0[24];
-  __IO uint32_t ICER[8];          // 0x080 (R/W)  Interrupt Clear Enable Register
+  A_IO uint32_t ICER[8];          // 0x080 (R/W)  Interrupt Clear Enable Register
        uint32_t RSERVED1[24];
-  __IO uint32_t ISPR[8];          // 0x100 (R/W)  Interrupt Set Pending Register
+  A_IO uint32_t ISPR[8];          // 0x100 (R/W)  Interrupt Set Pending Register
        uint32_t RESERVED2[24];
-  __IO uint32_t ICPR[8];          // 0x180 (R/W)  Interrupt Clear Pending Register
+  A_IO uint32_t ICPR[8];          // 0x180 (R/W)  Interrupt Clear Pending Register
        uint32_t RESERVED3[24];
-  __IO uint32_t IABR[8];          // 0x200 (R/W)  Interrupt Active bit Register
+  A_IO uint32_t IABR[8];          // 0x200 (R/W)  Interrupt Active bit Register
        uint32_t RESERVED4[56];
-  __IO uint8_t  IP[240];          // 0x300 (R/W)  Interrupt Priority Register (8Bit wide)
+  A_IO uint8_t  IP[240];          // 0x300 (R/W)  Interrupt Priority Register (8Bit wide)
        uint32_t RESERVED5[644];
-  __O  uint32_t STIR;             // 0xE00 ( /W)  Software Trigger Interrupt Register
+  A_O  uint32_t STIR;             // 0xE00 ( /W)  Software Trigger Interrupt Register
 };
 
 // System Timer (SysTick).
 struct SysTick_Type {
-  __IO uint32_t CTRL;             // 0x000 (R/W)  SysTick Control and Status Register
-  __IO uint32_t LOAD;             // 0x004 (R/W)  SysTick Reload Value Register
-  __IO uint32_t VAL;              // 0x008 (R/W)  SysTick Current Value Register
-  __I  uint32_t CALIB;            // 0x00C (R/ )  SysTick Calibration Register
+  A_IO uint32_t CTRL;             // 0x000 (R/W)  SysTick Control and Status Register
+  A_IO uint32_t LOAD;             // 0x004 (R/W)  SysTick Reload Value Register
+  A_IO uint32_t VAL;              // 0x008 (R/W)  SysTick Current Value Register
+  A_I  uint32_t CALIB;            // 0x00C (R/ )  SysTick Calibration Register
 };
 
 // General Purpose I/O.
 struct GPIO_Type {
-  __IO uint32_t MODER;    // port mode register,                0x00      
-  __IO uint32_t OTYPER;   // port output type register,         0x04      
-  __IO uint32_t OSPEEDR;  // port output speed register,        0x08      
-  __IO uint32_t PUPDR;    // port pull-up/pull-down register,   0x0C      
-  __IO uint32_t IDR;      // port input data register,          0x10      
-  __IO uint32_t ODR;      // port output data register,         0x14      
-  __IO uint32_t BSRR;     // port bit set/reset register,       0x18      
-  __IO uint32_t LCKR;     // port configuration lock register,  0x1C      
-  __IO uint32_t AFR[2];   // alternate function registers,      0x20-0x24 
+  A_IO uint32_t MODER;    // port mode register,                0x00      
+  A_IO uint32_t OTYPER;   // port output type register,         0x04      
+  A_IO uint32_t OSPEEDR;  // port output speed register,        0x08      
+  A_IO uint32_t PUPDR;    // port pull-up/pull-down register,   0x0C      
+  A_IO uint32_t IDR;      // port input data register,          0x10      
+  A_IO uint32_t ODR;      // port output data register,         0x14      
+  A_IO uint32_t BSRR;     // port bit set/reset register,       0x18      
+  A_IO uint32_t LCKR;     // port configuration lock register,  0x1C      
+  A_IO uint32_t AFR[2];   // alternate function registers,      0x20-0x24 
 };
 
 // Reset and Clock Control.
 struct RCC_Type {
-  __IO uint32_t CR;            // RCC clock control register,                          0x00 
-  __IO uint32_t PLLCFGR;       // RCC PLL configuration register,                      0x04 
-  __IO uint32_t CFGR;          // RCC clock configuration register,                    0x08 
-  __IO uint32_t CIR;           // RCC clock interrupt register,                        0x0C 
-  __IO uint32_t AHB1RSTR;      // RCC AHB1 peripheral reset register,                  0x10 
-  __IO uint32_t AHB2RSTR;      // RCC AHB2 peripheral reset register,                  0x14 
-  __IO uint32_t AHB3RSTR;      // RCC AHB3 peripheral reset register,                  0x18 
+  A_IO uint32_t CR;            // RCC clock control register,                          0x00 
+  A_IO uint32_t PLLCFGR;       // RCC PLL configuration register,                      0x04 
+  A_IO uint32_t CFGR;          // RCC clock configuration register,                    0x08 
+  A_IO uint32_t CIR;           // RCC clock interrupt register,                        0x0C 
+  A_IO uint32_t AHB1RSTR;      // RCC AHB1 peripheral reset register,                  0x10 
+  A_IO uint32_t AHB2RSTR;      // RCC AHB2 peripheral reset register,                  0x14 
+  A_IO uint32_t AHB3RSTR;      // RCC AHB3 peripheral reset register,                  0x18 
        uint32_t RESERVED0;     // Reserved, 0x1C                                            
-  __IO uint32_t APB1RSTR;      // RCC APB1 peripheral reset register,                  0x20 
-  __IO uint32_t APB2RSTR;      // RCC APB2 peripheral reset register,                  0x24 
+  A_IO uint32_t APB1RSTR;      // RCC APB1 peripheral reset register,                  0x20 
+  A_IO uint32_t APB2RSTR;      // RCC APB2 peripheral reset register,                  0x24 
        uint32_t RESERVED1[2];  // Reserved, 0x28-0x2C                                       
-  __IO uint32_t AHB1ENR;       // RCC AHB1 peripheral clock register,                  0x30 
-  __IO uint32_t AHB2ENR;       // RCC AHB2 peripheral clock register,                  0x34 
-  __IO uint32_t AHB3ENR;       // RCC AHB3 peripheral clock register,                  0x38 
+  A_IO uint32_t AHB1ENR;       // RCC AHB1 peripheral clock register,                  0x30 
+  A_IO uint32_t AHB2ENR;       // RCC AHB2 peripheral clock register,                  0x34 
+  A_IO uint32_t AHB3ENR;       // RCC AHB3 peripheral clock register,                  0x38 
        uint32_t RESERVED2;     // Reserved, 0x3C                                            
-  __IO uint32_t APB1ENR;       // RCC APB1 peripheral clock enable register,           0x40 
-  __IO uint32_t APB2ENR;       // RCC APB2 peripheral clock enable register,           0x44 
+  A_IO uint32_t APB1ENR;       // RCC APB1 peripheral clock enable register,           0x40 
+  A_IO uint32_t APB2ENR;       // RCC APB2 peripheral clock enable register,           0x44 
        uint32_t RESERVED3[2];  // Reserved, 0x48-0x4C                                       
-  __IO uint32_t AHB1LPENR;     // RCC AHB1 peripheral clock enable in low power mode   0x50 
-  __IO uint32_t AHB2LPENR;     // RCC AHB2 peripheral clock enable in low power mode   0x54 
-  __IO uint32_t AHB3LPENR;     // RCC AHB3 peripheral clock enable in low power mode   0x58 
+  A_IO uint32_t AHB1LPENR;     // RCC AHB1 peripheral clock enable in low power mode   0x50 
+  A_IO uint32_t AHB2LPENR;     // RCC AHB2 peripheral clock enable in low power mode   0x54 
+  A_IO uint32_t AHB3LPENR;     // RCC AHB3 peripheral clock enable in low power mode   0x58 
        uint32_t RESERVED4;     // Reserved, 0x5C                                            
-  __IO uint32_t APB1LPENR;     // RCC APB1 peripheral clock enable in low power mode   0x60 
-  __IO uint32_t APB2LPENR;     // RCC APB2 peripheral clock enable in low power mode   0x64 
+  A_IO uint32_t APB1LPENR;     // RCC APB1 peripheral clock enable in low power mode   0x60 
+  A_IO uint32_t APB2LPENR;     // RCC APB2 peripheral clock enable in low power mode   0x64 
        uint32_t RESERVED5[2];  // Reserved, 0x68-0x6C                                       
-  __IO uint32_t BDCR;          // RCC Backup domain control register,                  0x70 
-  __IO uint32_t CSR;           // RCC clock control & status register,                 0x74 
+  A_IO uint32_t BDCR;          // RCC Backup domain control register,                  0x70 
+  A_IO uint32_t CSR;           // RCC clock control & status register,                 0x74 
        uint32_t RESERVED6[2];  // Reserved, 0x78-0x7C                                       
-  __IO uint32_t SSCGR;         // RCC spread spectrum clock generation register,       0x80 
-  __IO uint32_t PLLI2SCFGR;    // RCC PLLI2S configuration register,                   0x84 
-  __IO uint32_t PLLSAICFGR;    // RCC PLLSAI configuration register,                   0x88 
-  __IO uint32_t DCKCFGR1;      // RCC Dedicated Clocks configuration register1,        0x8C 
-  __IO uint32_t DCKCFGR2;      // RCC Dedicated Clocks configuration register 2,       0x90
+  A_IO uint32_t SSCGR;         // RCC spread spectrum clock generation register,       0x80 
+  A_IO uint32_t PLLI2SCFGR;    // RCC PLLI2S configuration register,                   0x84 
+  A_IO uint32_t PLLSAICFGR;    // RCC PLLSAI configuration register,                   0x88 
+  A_IO uint32_t DCKCFGR1;      // RCC Dedicated Clocks configuration register1,        0x8C 
+  A_IO uint32_t DCKCFGR2;      // RCC Dedicated Clocks configuration register 2,       0x90
 };
 
 #define  RCC_AHB1ENR_GPIOAEN      ((uint32_t)0x00000001)
@@ -158,13 +102,8 @@ struct RCC_Type {
 #define  RCC_AHB1ENR_OTGHSEN      ((uint32_t)0x20000000)
 #define  RCC_AHB1ENR_OTGHSULPIEN  ((uint32_t)0x40000000)
 
-
-#define SCS_BASE (0xE000E000UL)    // System Control Space Base Address.
 #define SysTick_BASE (SCS_BASE +  0x0010UL)
 #define NVIC_BASE (SCS_BASE +  0x0100UL)
-#define SCB_BASE (SCS_BASE +  0x0D00UL)
-
-#define PERIPH_BASE       ((uint32_t)0x40000000) // AHB/ABP Peripherals.
 
 // Peripheral memory map.
 #define APB1PERIPH_BASE        PERIPH_BASE
@@ -198,7 +137,6 @@ struct RCC_Type {
 #define GPIOJ     ((GPIO_Type*) GPIOJ_BASE)
 #define GPIOK     ((GPIO_Type*) GPIOK_BASE)
 
-#define SCB ((SCB_Type*) SCB_BASE)
 #define SysTick ((SysTick_Type *) SysTick_BASE) 
 #define NVIC ((NVIC_Type*) NVIC_BASE)
 #define RCC  ((RCC_Type*) RCC_BASE)
@@ -276,15 +214,15 @@ __attribute__((always_inline)) void __WFI() {
 inline void EnableICache() {
   __DSB();
   __ISB();
-  SCB->ICIALLU = 0UL;                     // invalidate I-Cache
-  SCB->CCR |=  (uint32_t)SCB_CCR_IC_Msk;  // enable I-Cache
+  SYSCTRLBLK->ICIALLU = 0UL;                     // invalidate I-Cache
+  SYSCTRLBLK->CCR |=  (uint32_t)SCB_CCR_IC_Msk;  // enable I-Cache
   __DSB();
   __ISB();
 }
 
 inline void EnableDCache() {
-  SCB->CSSELR = (0UL << 1) | 0UL;         // Level 1 data cache
-  uint32_t ccsidr  = SCB->CCSIDR;
+  SYSCTRLBLK->CSSELR = (0UL << 1) | 0UL;         // Level 1 data cache
+  uint32_t ccsidr  = SYSCTRLBLK->CCSIDR;
   auto sets    = (uint32_t)(CCSIDR_SETS(ccsidr));
   auto sshift  = (uint32_t)(CCSIDR_LSSHIFT(ccsidr) + 4UL);
   auto ways    = (uint32_t)(CCSIDR_WAYS(ccsidr));
@@ -296,12 +234,12 @@ inline void EnableDCache() {
     auto tmpways = ways;
     do {
       auto sw = ((tmpways << wshift) | (sets << sshift));
-      SCB->DCISW = sw;
+      SYSCTRLBLK->DCISW = sw;
     } while(tmpways--);
   } while(sets--);
 
   __DSB();
-  SCB->CCR |=  (uint32_t)SCB_CCR_DC_Msk;   // enable D-Cache
+  SYSCTRLBLK->CCR |=  (uint32_t)SCB_CCR_DC_Msk;   // enable D-Cache
   __DSB();
   __ISB();  
 }
@@ -321,13 +259,13 @@ void halt_bp() {
 inline void NVIC_SetPriorityGrouping(uint32_t PriorityGroup) {
   // Only values 0..7 are used.
   uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07UL);      
-  uint32_t reg_value  =  SCB->AIRCR;
+  uint32_t reg_value  =  SYSCTRLBLK->AIRCR;
   reg_value &= ~((uint32_t)(SCB_AIRCR_VECTKEY_Msk | SCB_AIRCR_PRIGROUP_Msk));
   // Insert write key and priorty group.
   reg_value = (reg_value |
               ((uint32_t)0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
               (PriorityGroupTmp << 8));
-  SCB->AIRCR = reg_value;
+  SYSCTRLBLK->AIRCR = reg_value;
 }
 
 // Set Interrupt Priority
@@ -338,7 +276,7 @@ inline void NVIC_SetPriorityGrouping(uint32_t PriorityGroup) {
 
 inline void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority) {
   if((int32_t)IRQn < 0) {
-    SCB->SHPR[(((uint32_t)(int32_t)IRQn) & 0xFUL)-4UL] =
+    SYSCTRLBLK->SHPR[(((uint32_t)(int32_t)IRQn) & 0xFUL)-4UL] =
         (uint8_t)((priority << (8 - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
   } else {
     NVIC->IP[((uint32_t)(int32_t)IRQn)] =
