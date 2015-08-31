@@ -2,6 +2,7 @@
 #include "arch/memory_macros.h"
 #include "arch/arm/cortex-m/interrupt_types.h"
 #include "arch/arm/cortex-m/system_control_block.h"
+#include "arch/arm/cortex-m/reset_clock_control_block.h"
 
 // Nested Vectored Interrupt Controller (NVIC)
 struct NVIC_Type {
@@ -41,75 +42,8 @@ struct GPIO_Type {
   A_IO uint32_t AFR[2];   // alternate function registers,      0x20-0x24 
 };
 
-// Reset and Clock Control.
-struct RCC_Type {
-  A_IO uint32_t CR;            // RCC clock control register,                          0x00 
-  A_IO uint32_t PLLCFGR;       // RCC PLL configuration register,                      0x04 
-  A_IO uint32_t CFGR;          // RCC clock configuration register,                    0x08 
-  A_IO uint32_t CIR;           // RCC clock interrupt register,                        0x0C 
-  A_IO uint32_t AHB1RSTR;      // RCC AHB1 peripheral reset register,                  0x10 
-  A_IO uint32_t AHB2RSTR;      // RCC AHB2 peripheral reset register,                  0x14 
-  A_IO uint32_t AHB3RSTR;      // RCC AHB3 peripheral reset register,                  0x18 
-       uint32_t RESERVED0;     // Reserved, 0x1C                                            
-  A_IO uint32_t APB1RSTR;      // RCC APB1 peripheral reset register,                  0x20 
-  A_IO uint32_t APB2RSTR;      // RCC APB2 peripheral reset register,                  0x24 
-       uint32_t RESERVED1[2];  // Reserved, 0x28-0x2C                                       
-  A_IO uint32_t AHB1ENR;       // RCC AHB1 peripheral clock register,                  0x30 
-  A_IO uint32_t AHB2ENR;       // RCC AHB2 peripheral clock register,                  0x34 
-  A_IO uint32_t AHB3ENR;       // RCC AHB3 peripheral clock register,                  0x38 
-       uint32_t RESERVED2;     // Reserved, 0x3C                                            
-  A_IO uint32_t APB1ENR;       // RCC APB1 peripheral clock enable register,           0x40 
-  A_IO uint32_t APB2ENR;       // RCC APB2 peripheral clock enable register,           0x44 
-       uint32_t RESERVED3[2];  // Reserved, 0x48-0x4C                                       
-  A_IO uint32_t AHB1LPENR;     // RCC AHB1 peripheral clock enable in low power mode   0x50 
-  A_IO uint32_t AHB2LPENR;     // RCC AHB2 peripheral clock enable in low power mode   0x54 
-  A_IO uint32_t AHB3LPENR;     // RCC AHB3 peripheral clock enable in low power mode   0x58 
-       uint32_t RESERVED4;     // Reserved, 0x5C                                            
-  A_IO uint32_t APB1LPENR;     // RCC APB1 peripheral clock enable in low power mode   0x60 
-  A_IO uint32_t APB2LPENR;     // RCC APB2 peripheral clock enable in low power mode   0x64 
-       uint32_t RESERVED5[2];  // Reserved, 0x68-0x6C                                       
-  A_IO uint32_t BDCR;          // RCC Backup domain control register,                  0x70 
-  A_IO uint32_t CSR;           // RCC clock control & status register,                 0x74 
-       uint32_t RESERVED6[2];  // Reserved, 0x78-0x7C                                       
-  A_IO uint32_t SSCGR;         // RCC spread spectrum clock generation register,       0x80 
-  A_IO uint32_t PLLI2SCFGR;    // RCC PLLI2S configuration register,                   0x84 
-  A_IO uint32_t PLLSAICFGR;    // RCC PLLSAI configuration register,                   0x88 
-  A_IO uint32_t DCKCFGR1;      // RCC Dedicated Clocks configuration register1,        0x8C 
-  A_IO uint32_t DCKCFGR2;      // RCC Dedicated Clocks configuration register 2,       0x90
-};
-
-#define  RCC_AHB1ENR_GPIOAEN      ((uint32_t)0x00000001)
-#define  RCC_AHB1ENR_GPIOBEN      ((uint32_t)0x00000002)
-#define  RCC_AHB1ENR_GPIOCEN      ((uint32_t)0x00000004)
-#define  RCC_AHB1ENR_GPIODEN      ((uint32_t)0x00000008)
-#define  RCC_AHB1ENR_GPIOEEN      ((uint32_t)0x00000010)
-#define  RCC_AHB1ENR_GPIOFEN      ((uint32_t)0x00000020)
-#define  RCC_AHB1ENR_GPIOGEN      ((uint32_t)0x00000040)
-#define  RCC_AHB1ENR_GPIOHEN      ((uint32_t)0x00000080)
-#define  RCC_AHB1ENR_GPIOIEN      ((uint32_t)0x00000100)
-#define  RCC_AHB1ENR_GPIOJEN      ((uint32_t)0x00000200)
-#define  RCC_AHB1ENR_GPIOKEN      ((uint32_t)0x00000400)
-#define  RCC_AHB1ENR_CRCEN        ((uint32_t)0x00001000)
-#define  RCC_AHB1ENR_BKPSRAMEN    ((uint32_t)0x00040000)
-#define  RCC_AHB1ENR_DTCMRAMEN    ((uint32_t)0x00100000)
-#define  RCC_AHB1ENR_DMA1EN       ((uint32_t)0x00200000)
-#define  RCC_AHB1ENR_DMA2EN       ((uint32_t)0x00400000)
-#define  RCC_AHB1ENR_DMA2DEN      ((uint32_t)0x00800000)
-#define  RCC_AHB1ENR_ETHMACEN     ((uint32_t)0x02000000)
-#define  RCC_AHB1ENR_ETHMACTXEN   ((uint32_t)0x04000000)
-#define  RCC_AHB1ENR_ETHMACRXEN   ((uint32_t)0x08000000)
-#define  RCC_AHB1ENR_ETHMACPTPEN  ((uint32_t)0x10000000)
-#define  RCC_AHB1ENR_OTGHSEN      ((uint32_t)0x20000000)
-#define  RCC_AHB1ENR_OTGHSULPIEN  ((uint32_t)0x40000000)
-
 #define SysTick_BASE (SCS_BASE +  0x0010UL)
 #define NVIC_BASE (SCS_BASE +  0x0100UL)
-
-// Peripheral memory map.
-#define APB1PERIPH_BASE        PERIPH_BASE
-#define APB2PERIPH_BASE       (PERIPH_BASE + 0x00010000)
-#define AHB1PERIPH_BASE       (PERIPH_BASE + 0x00020000)
-#define AHB2PERIPH_BASE       (PERIPH_BASE + 0x10000000)
 
 #define GPIOA_BASE        (AHB1PERIPH_BASE + 0x0000)
 #define GPIOB_BASE        (AHB1PERIPH_BASE + 0x0400)
@@ -122,8 +56,6 @@ struct RCC_Type {
 #define GPIOI_BASE        (AHB1PERIPH_BASE + 0x2000)
 #define GPIOJ_BASE        (AHB1PERIPH_BASE + 0x2400)
 #define GPIOK_BASE        (AHB1PERIPH_BASE + 0x2800)
-
-#define RCC_BASE           (AHB1PERIPH_BASE + 0x3800)
 
 #define GPIOA     ((GPIO_Type*) GPIOA_BASE)
 #define GPIOB     ((GPIO_Type*) GPIOB_BASE)
@@ -139,7 +71,6 @@ struct RCC_Type {
 
 #define SysTick ((SysTick_Type *) SysTick_BASE) 
 #define NVIC ((NVIC_Type*) NVIC_BASE)
-#define RCC  ((RCC_Type*) RCC_BASE)
 
 #define SCB_CCR_IC_Pos 17
 #define SCB_CCR_IC_Msk (1UL << SCB_CCR_IC_Pos)
@@ -333,9 +264,9 @@ bool ReadBit(const volatile uint32_t& reg, uint32_t bit) {
 
 inline bool GPIOA_EnableClock() {
   volatile uint32_t tmpreg;
-  SetBit(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
+  SetBit(RSTCLKBLK->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
   // Delay after an RCC peripheral clock enabling.
-  return ReadBit(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
+  return ReadBit(RSTCLKBLK->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
 }
 
 struct GPIO_InitType {

@@ -1,7 +1,14 @@
 #ifndef ARCH_ARM_CORTEX_M_MEMORY_MAP_H
 #define ARCH_ARM_CORTEX_M_MEMORY_MAP_H
 
-#define SCS_BASE      (0xE000E000UL)  // System Control Space Base Address.
-#define PERIPH_BASE   (0x40000000UL)  // AHB/ABP Peripherals.
+#define PERIPH_BASE       (0x40000000UL)  // AHB/ABP Peripherals.
+
+#define APB1PERIPH_BASE   (PERIPH_BASE + 0x00000000UL)
+#define APB2PERIPH_BASE   (PERIPH_BASE + 0x00010000UL)
+#define AHB1PERIPH_BASE   (PERIPH_BASE + 0x00020000UL)
+#define AHB2PERIPH_BASE   (PERIPH_BASE + 0x10000000UL)
+
+#define SCS_BASE          (0xE000E000UL)  // System Control Space.
+
 
 #endif  // ARCH_ARM_CORTEX_M_MEMORY_MAP_H
