@@ -7,4 +7,7 @@
 #define A_O   volatile             //  Write-only register.
 #define A_IO  volatile             //  Read-Write register.
 
+#define ASM_DSB __asm volatile ("dsb 0xF":::"memory")
+#define ASM_ISB __asm volatile ("isb 0xF":::"memory")
+
 #endif // ARCH_MEMORY_MACROS_H

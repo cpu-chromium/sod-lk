@@ -6,6 +6,7 @@ executable("bare_blinker") {
   sources = [
     "bare/blinker/main.cc",
     "//arch/arm/cortex-m/startup.c",
+    "//arch/arm/cortex-m/system_control_block.cc"
   ]
 }
 

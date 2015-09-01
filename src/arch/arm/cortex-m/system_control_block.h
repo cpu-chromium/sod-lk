@@ -1,7 +1,7 @@
 #ifndef ARCH_ARM_CORTEX_M_SYSTEM_CONTROL_BLOCK_H
 #define ARCH_ARM_CORTEX_M_SYSTEM_CONTROL_BLOCK_H
 
-
+#include <stdint.h>
 #include "arch/memory_macros.h"
 #include "arch/arm/cortex-m/memory_map.h"
 
@@ -57,6 +57,9 @@ struct SystemControlBlock {
        uint32_t RESERVED8[1];
   A_IO uint32_t ABFSR;         // 0x2A8 Auxiliary Bus Fault Status Register       
 };
+
+void EnableICache();
+void EnableDCache();
 
 #define SYSCTRLBLK ((SystemControlBlock*) (SCS_BASE + 0x0D00UL))
 
