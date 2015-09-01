@@ -23,6 +23,13 @@
 #define CCSIDR_SETS(x) (((x) & SCB_CCSIDR_NUMSETS_Msk) >> SCB_CCSIDR_NUMSETS_Pos      )
 #define CCSIDR_LSSHIFT(x) (((x) & SCB_CCSIDR_LINESIZE_Msk) /*shift r 0*/)
 
+// SCB Application Interrupt and Reset Control Register Definitions
+#define SCB_AIRCR_VECTKEY_Pos 16            
+#define SCB_AIRCR_VECTKEY_Msk (0xFFFFUL << SCB_AIRCR_VECTKEY_Pos)
+
+#define SCB_AIRCR_PRIGROUP_Pos 8
+#define SCB_AIRCR_PRIGROUP_Msk (7UL << SCB_AIRCR_PRIGROUP_Pos)
+
 
 void EnableICache() {
   ASM_DSB;
@@ -55,4 +62,22 @@ void EnableDCache() {
   SYSCTRLBLK->CCR |=  (uint32_t)SCB_CCR_DC_Msk;   // enable D-Cache
   ASM_DSB;
   ASM_ISB;  
+}
+
+//  The function sets the priority grouping field using the required unlock sequence.
+//    The parameter PriorityGroup is assigned to the field SCB->AIRCR [10:8].
+//    Only values from 0..7 are used.
+//    In case of a conflict between priority grouping and available
+//    priority bits (__NVIC_PRIO_BITS), the smallest possible priority group is set.
+
+void SetPriorityGrouping(uint32_t PriorityGroup) {
+  // Only values 0..7 are used.
+  uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07UL);      
+  uint32_t reg_value  =  SYSCTRLBLK->AIRCR;
+  reg_value &= ~((uint32_t)(SCB_AIRCR_VECTKEY_Msk | SCB_AIRCR_PRIGROUP_Msk));
+  // Insert write key and priorty group.
+  reg_value = (reg_value |
+              ((uint32_t)0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
+              (PriorityGroupTmp << 8));
+  SYSCTRLBLK->AIRCR = reg_value;
 }

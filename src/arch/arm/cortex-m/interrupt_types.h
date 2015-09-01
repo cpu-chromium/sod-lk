@@ -1,3 +1,7 @@
+#ifndef ARCH_ARM_CORTEX_M_INTERRUPT_TYPES_H
+#define ARCH_ARM_CORTEX_M_INTERRUPT_TYPES_H
+
+
 // STM32F7xx Interrupt Number Definition, according to the selected device 
  
 enum IRQn_Type {
@@ -110,3 +114,5 @@ enum IRQn_Type {
   I2C4_ER_IRQn                = 96,   // I2C4 Error Interrupt                                             
   SPDIF_RX_IRQn               = 97    // SPDIF-RX global Interrupt                                          
 };
+
+#endif  // ARCH_ARM_CORTEX_M_INTERRUPT_TYPES_H

@@ -61,6 +61,16 @@ struct SystemControlBlock {
 void EnableICache();
 void EnableDCache();
 
+// Priority groups.
+// A:B  => A bits for pre-emption priority, B bits for subpriority.
+#define PRIORITYGROUP_0 ((uint32_t)0x00000007) // 0:4 bits
+#define PRIORITYGROUP_1 ((uint32_t)0x00000006) // 1:3 bits
+#define PRIORITYGROUP_2 ((uint32_t)0x00000005) // 2:2 bits
+#define PRIORITYGROUP_3 ((uint32_t)0x00000004) // 3:1 bits
+#define PRIORITYGROUP_4 ((uint32_t)0x00000003) // 4:0 bits
+
+void SetPriorityGrouping(uint32_t PriorityGroup);
+
 #define SYSCTRLBLK ((SystemControlBlock*) (SCS_BASE + 0x0D00UL))
 
 #endif  // ARCH_ARM_CORTEX_M_SYSTEM_CONTROL_BLOCK_H

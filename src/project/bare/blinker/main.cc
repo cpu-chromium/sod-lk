@@ -3,23 +3,7 @@
 #include "arch/arm/cortex-m/interrupt_types.h"
 #include "arch/arm/cortex-m/system_control_block.h"
 #include "arch/arm/cortex-m/reset_clock_control_block.h"
-
-// Nested Vectored Interrupt Controller (NVIC)
-struct NVIC_Type {
-  A_IO uint32_t ISER[8];          // 0x000 (R/W)  Interrupt Set Enable Register
-       uint32_t RESERVED0[24];
-  A_IO uint32_t ICER[8];          // 0x080 (R/W)  Interrupt Clear Enable Register
-       uint32_t RSERVED1[24];
-  A_IO uint32_t ISPR[8];          // 0x100 (R/W)  Interrupt Set Pending Register
-       uint32_t RESERVED2[24];
-  A_IO uint32_t ICPR[8];          // 0x180 (R/W)  Interrupt Clear Pending Register
-       uint32_t RESERVED3[24];
-  A_IO uint32_t IABR[8];          // 0x200 (R/W)  Interrupt Active bit Register
-       uint32_t RESERVED4[56];
-  A_IO uint8_t  IP[240];          // 0x300 (R/W)  Interrupt Priority Register (8Bit wide)
-       uint32_t RESERVED5[644];
-  A_O  uint32_t STIR;             // 0xE00 ( /W)  Software Trigger Interrupt Register
-};
+#include "arch/arm/cortex-m/nested_interrupt_controller.h"
 
 // System Timer (SysTick).
 struct SysTick_Type {
@@ -43,7 +27,6 @@ struct GPIO_Type {
 };
 
 #define SysTick_BASE (SCS_BASE +  0x0010UL)
-#define NVIC_BASE (SCS_BASE +  0x0100UL)
 
 #define GPIOA_BASE        (AHB1PERIPH_BASE + 0x0000)
 #define GPIOB_BASE        (AHB1PERIPH_BASE + 0x0400)
@@ -70,20 +53,6 @@ struct GPIO_Type {
 #define GPIOK     ((GPIO_Type*) GPIOK_BASE)
 
 #define SysTick ((SysTick_Type *) SysTick_BASE) 
-#define NVIC ((NVIC_Type*) NVIC_BASE)
-
-// Priority groups.
-#define NVIC_PRIORITYGROUP_0 ((uint32_t)0x00000007) // 0 bits for pre-emption priority
-                                                    // 4 bits for subpriority
-#define NVIC_PRIORITYGROUP_1 ((uint32_t)0x00000006) // 1 bits for pre-emption priority
-                                                    // 3 bits for subpriority
-#define NVIC_PRIORITYGROUP_2 ((uint32_t)0x00000005) // 2 bits for pre-emption priority
-                                                    // 2 bits for subpriority
-#define NVIC_PRIORITYGROUP_3 ((uint32_t)0x00000004) // 3 bits for pre-emption priority
-                                                    // 1 bits for subpriority
-#define NVIC_PRIORITYGROUP_4 ((uint32_t)0x00000003) // 4 bits for pre-emption priority
-                                                    // 0 bits for subpriority
-#define __NVIC_PRIO_BITS 3
 
 //* SysTick Reload Register Definitions
 #define SysTick_CTRL_CLKSOURCE_Pos 2                                    
@@ -100,6 +69,7 @@ struct GPIO_Type {
 
 #define  TICK_INT_PRIORITY ((uint32_t)0x0F)
 
+
 __attribute__((always_inline)) void __WFI() {
   __asm volatile ("wfi");
 }
@@ -108,47 +78,6 @@ __attribute__((always_inline)) void __WFI() {
 
 void halt_bp() {
   __BKPT(6);  
-}
-
-// SCB Application Interrupt and Reset Control Register Definitions
-#define SCB_AIRCR_VECTKEY_Pos 16            
-#define SCB_AIRCR_VECTKEY_Msk (0xFFFFUL << SCB_AIRCR_VECTKEY_Pos)
-
-#define SCB_AIRCR_PRIGROUP_Pos 8
-#define SCB_AIRCR_PRIGROUP_Msk (7UL << SCB_AIRCR_PRIGROUP_Pos)
-
-//  The function sets the priority grouping field using the required unlock sequence.
-//    The parameter PriorityGroup is assigned to the field SCB->AIRCR [10:8].
-//    Only values from 0..7 are used.
-//    In case of a conflict between priority grouping and available
-//    priority bits (__NVIC_PRIO_BITS), the smallest possible priority group is set.
-
-inline void NVIC_SetPriorityGrouping(uint32_t PriorityGroup) {
-  // Only values 0..7 are used.
-  uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07UL);      
-  uint32_t reg_value  =  SYSCTRLBLK->AIRCR;
-  reg_value &= ~((uint32_t)(SCB_AIRCR_VECTKEY_Msk | SCB_AIRCR_PRIGROUP_Msk));
-  // Insert write key and priorty group.
-  reg_value = (reg_value |
-              ((uint32_t)0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
-              (PriorityGroupTmp << 8));
-  SYSCTRLBLK->AIRCR = reg_value;
-}
-
-// Set Interrupt Priority
-//   The function sets the priority of an interrupt.
-//   note: The priority cannot be set for every core interrupt.
-//   |IRQn|  Interrupt number.
-//   |priority|  Priority to set.
-
-inline void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority) {
-  if((int32_t)IRQn < 0) {
-    SYSCTRLBLK->SHPR[(((uint32_t)(int32_t)IRQn) & 0xFUL)-4UL] =
-        (uint8_t)((priority << (8 - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
-  } else {
-    NVIC->IP[((uint32_t)(int32_t)IRQn)] =
-        (uint8_t)((priority << (8 - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
-  }
 }
 
 // System Tick Configuration
@@ -161,7 +90,7 @@ inline bool SysTick_Config(uint32_t ticks) {
     return false;    // Reload value impossible.
 
   SysTick->LOAD  = (uint32_t)(ticks - 1UL);
-  NVIC_SetPriority(SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL);
+  NVIC_SetPriority(SysTick_IRQn, (1UL << NVIC_PRIO_BITS) - 1UL);
   SysTick->VAL   = 0UL;
   SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
                    SysTick_CTRL_TICKINT_Msk   |
@@ -337,7 +266,8 @@ inline void GPIO_TogglePin(GPIO_Type* GPIOx, uint16_t GPIO_Pin) {
 
 int main() {
   EnableICache();
-  NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+  EnableDCache();
+  SetPriorityGrouping(PRIORITYGROUP_4);
   GPIOA_EnableClock();
 
   GPIO_InitType GPIO_InitStruct = {0};
