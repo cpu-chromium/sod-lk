@@ -82,7 +82,7 @@ toolchain("gcc") {
 toolchain("clang35_none") {
   tool("cc") {
     depfile = "{{output}}.d"
-    command = "clang-3.5 -target arm-none-eabi -mcpu=$arm_cpu -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
+    command = "clang -target arm-none-eabi -mcpu=$arm_cpu -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CC {{output}}"
     outputs = [
@@ -92,7 +92,7 @@ toolchain("clang35_none") {
 
   tool("cxx") {
     depfile = "{{output}}.d"
-    command = "clang-3.5 -target arm-none-eabi -mcpu=$arm_cpu -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
+    command = "clang -target arm-none-eabi -mcpu=$arm_cpu -MMD -MF $depfile {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c {{source}} -o {{output}}"
     depsformat = "gcc"
     description = "CXX {{output}}"
     outputs = [
